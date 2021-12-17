@@ -1,0 +1,48 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.aliyun.com/nexus/content/groups/public/' }
+    }
+}
+plugins {
+    id 'java'
+    id "com.github.johnrengelman.shadow" version "7.1.0"
+}
+repositories {
+    maven {
+        url = uri('https://maven.aliyun.com/nexus/content/groups/public/')
+    }
+    mavenLocal()
+}
+group 'cn.linshenkx.bigdata.kafka.auth'
+version '1.0'
+
+
+dependencies {
+    compileOnly 'org.apache.kafka:kafka_2.13:2.8.0'
+    compileOnly 'mysql:mysql-connector-java:8.0.26'
+    implementation 'com.alibaba:druid:1.2.8'
+    implementation 'commons-dbutils:commons-dbutils:1.7'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+shadowJar {
+//    baseName = 'kafka-auth-db'
+    mergeServiceFiles()
+    zip64 true
+
+    // 打包时排除指定的 jar 包
+    dependencies {
+        exclude(dependency('com.google.code.findbugs:jsr305'))
+    }
+
+    // 将 build.gradle 打入到 jar 中, 方便查看依赖包版本
+    from("./") {
+        include 'build.gradle'
+    }
+}
