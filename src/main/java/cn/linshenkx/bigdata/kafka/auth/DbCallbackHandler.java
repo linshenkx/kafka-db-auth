@@ -87,7 +87,7 @@ public class DbCallbackHandler implements AuthenticateCallbackHandler {
      */
     @Override
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-        log.info("handle");
+        log.debug("handle");
         String username = null;
         for (Callback callback : callbacks) {
             if (callback instanceof NameCallback) {
@@ -95,7 +95,7 @@ public class DbCallbackHandler implements AuthenticateCallbackHandler {
             } else if (callback instanceof PlainAuthenticateCallback) {
                 PlainAuthenticateCallback plainCallback = (PlainAuthenticateCallback) callback;
                 boolean authenticated = authenticate(username, plainCallback.password());
-                log.info("authenticate username:{},result:{}", username, authenticated);
+                log.debug("authenticate username:{},result:{}", username, authenticated);
                 plainCallback.authenticated(authenticated);
             } else {
                 throw new UnsupportedCallbackException(callback);
@@ -114,7 +114,7 @@ public class DbCallbackHandler implements AuthenticateCallbackHandler {
      */
     protected boolean authenticate(String username, char[] password) throws IOException {
         boolean fileAuthenticateResult = fileAuthenticate(username, password);
-        log.info("fileAuthenticateResult username:{},result:{}", username, fileAuthenticateResult);
+        log.debug("fileAuthenticateResult username:{},result:{}", username, fileAuthenticateResult);
         if (fileAuthenticateResult) {
             return true;
         }
@@ -123,7 +123,7 @@ public class DbCallbackHandler implements AuthenticateCallbackHandler {
         }
         try {
             boolean dbAuthenticateResult = dbAuthenticate(username, password);
-            log.info("dbAuthenticateResult username:{},result:{}", username, dbAuthenticateResult);
+            log.debug("dbAuthenticateResult username:{},result:{}", username, dbAuthenticateResult);
             return dbAuthenticateResult;
         } catch (Exception e) {
             log.error(" dbAuthenticate failed! ~lin");
@@ -144,7 +144,7 @@ public class DbCallbackHandler implements AuthenticateCallbackHandler {
     }
 
     private boolean dbAuthenticate(String username, char[] passwordCharArray) {
-        log.info("begin dbAuthenticateResult username:{}", username);
+        log.debug("begin dbAuthenticateResult username:{}", username);
         String password = new String(passwordCharArray);
         String tableName = (String) options.get("db_userTable");
         if (tableName == null) {
@@ -159,10 +159,10 @@ public class DbCallbackHandler implements AuthenticateCallbackHandler {
                 if (resultSet.next()) {
                     String dbPassword = resultSet.getString("password");
                     boolean checkResult = password.equals(dbPassword);
-                    log.info("user {} authentication status: {}.", username, checkResult);
+                    log.debug("user {} authentication status: {}.", username, checkResult);
                     return checkResult;
                 } else {
-                    log.info("user {} not found in db.", username);
+                    log.debug("user {} not found in db.", username);
                     return false;
                 }
             }
